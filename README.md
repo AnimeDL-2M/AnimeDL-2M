@@ -32,3 +32,4 @@ Please refer to README.md in AniXplore dir.
 
 ## 📄 About the Project Page
 
+https://animedl-2m.github.io/AnimeDL-2M/
