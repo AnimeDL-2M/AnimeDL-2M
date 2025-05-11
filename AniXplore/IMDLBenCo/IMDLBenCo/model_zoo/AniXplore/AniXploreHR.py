@@ -783,12 +783,23 @@ class AniXploreHR(nn.Module):
         mask_pred = torch.sigmoid(pred_mask)
 
 
-        cls_logit = self.cls_head(fused_feat)
+        raw_cls_logit = self.cls_head(fused_feat)
         label = label.float()
-        cls_loss = F.binary_cross_entropy_with_logits(cls_logit[:, -1, ...], label)
-        # get label for output
-        cls_logit = torch.softmax(cls_logit, dim=1)
-        pred_label = cls_logit[:, -1, ...]
+        cls_loss = F.binary_cross_entropy_with_logits(raw_cls_logit[:, -1, ...], label)
+
+        # generate pred_label
+        # print("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        # print(f'raw_cls_logit={raw_cls_logit}')
+        # cls_logit = torch.softmax(raw_cls_logit, dim=1)
+        # pred_label = cls_logit[:, -1, ...]
+        # print(f'cls_logit={cls_logit}')
+        # print(f'pred_label={pred_label}')
+        pred_label_prob_2d = torch.sigmoid(raw_cls_logit)  # Shape: [batch_size, 1]
+        pred_label_prob_1d = pred_label_prob_2d.squeeze(-1)    # Shape: [batch_size]
+        pred_label_binary = (pred_label_prob_1d > 0.5).float()
+        # print(f'pred_label_prob = {pred_label_prob}')
+        # print(f'pred_label_binary = {pred_label_binary}')
+
         combined_loss = self.auto_weight(loss, cls_loss)
 
         output_dict = {
@@ -797,7 +808,7 @@ class AniXploreHR(nn.Module):
             # predicted mask, will calculate for metrics automatically
             "pred_mask": mask_pred,
             # predicted binaray label, will calculate for metrics automatically
-            "pred_label": pred_label,
+            "pred_label": pred_label_binary,
 
             # ----values below is for visualization----
             # automatically visualize with the key-value pairs
