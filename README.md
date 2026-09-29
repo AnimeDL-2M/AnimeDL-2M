@@ -1,3 +1,7 @@
+Latest Repo: https://github.com/FlyTweety/AnimeDL2M
+
+below is outdated:
+---
 # AnimeDL-2M
 
 Here is the repo for our paper:  
